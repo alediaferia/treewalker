@@ -8,15 +8,27 @@ class RandomTreeGenerator {
 
         val root = Node()
         var nodesToProcess = mutableListOf(root)
-        while (nodesToProcess.isNotEmpty()) {
-            val currentRoot = nodesToProcess.first()
+        var startIndex = 0
+        while (startIndex < nodesToProcess.size) {
+            val currentRoot = nodesToProcess[startIndex]
             if (currentRoot.depth < maxDepth) {
-                val childrenCount = Random.nextInt(1, maxChildrenForBranch)
+                val childrenCount = Random.nextInt(0, maxChildrenForBranch)
                 currentRoot.children = List(childrenCount) { Node(currentRoot.depth + 1) }
 
+                if (currentRoot.children.isEmpty()) {
+                    currentRoot.score1 = Random.nextInt(0, 6)
+                    currentRoot.score2 = Random.nextInt(0, 6)
+                    currentRoot.score3 = Random.nextInt(0, 6)
+                }
+
                 nodesToProcess.addAll(currentRoot.children)
-            } else break
-            nodesToProcess = nodesToProcess.subList(1, nodesToProcess.size)
+            } else {
+                currentRoot.score1 = Random.nextInt(0, 6)
+                currentRoot.score2 = Random.nextInt(0, 6)
+                currentRoot.score3 = Random.nextInt(0, 6)
+                break
+            }
+            startIndex++
         }
 
 //        println("Produced $totalNodes nodes")
