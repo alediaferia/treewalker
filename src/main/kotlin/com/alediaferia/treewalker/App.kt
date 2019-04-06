@@ -6,9 +6,9 @@ import kotlin.system.measureTimeMillis
 fun main(args: Array<String>) {
     println("Creating tree...")
 
-    lateinit var root : Node
+    lateinit var root: Node
     val creationTook = measureTimeMillis {
-        root = RandomTreeGenerator().generate(8, 15)
+        root = RandomTreeGenerator().generate(15, 8)
     }
     println("Tree creation completed. ($creationTook ms)")
 
@@ -39,7 +39,7 @@ fun main(args: Array<String>) {
 //    println("${Node().apply { children.addAll(listOf(Node().apply { children.add(Node()) }, Node())) }.totalCountRecursive()}")
 }
 
-private val charPool : List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+private val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
 
 fun Node.totalCountRecursive(): Int {
 //    println("(recursive) Current stack depth: ${currentStackTrace().size}")
@@ -51,32 +51,32 @@ fun Node.totalScore3CountRecursive(): Long {
 }
 
 fun Node.totalCountTailrec(): Int {
-    return totalChildrenCount(mutableListOf(this), 1)
+    return totalChildrenCount(listOf(this).iterator(), 1)
 }
 
 fun Node.totalScore3Count(): Long {
-    return totalScore3Aggregate(mutableListOf(this), this.score3.toLong())
+    return totalScore3Aggregate(listOf(this).iterator(), this.score3.toLong())
 }
 
-private tailrec fun totalChildrenCount(nodes: MutableList<Node>, acc: Int = 0, start: Int = 0): Int {
+private tailrec fun totalChildrenCount(nodes: Iterator<Node>, acc: Int = 0): Int {
 //    println("(tailrec) Current stack depth: ${currentStackTrace().size}")
     return when {
-        start >= nodes.size -> acc
+        !nodes.hasNext() -> acc
         else -> {
-            val current = nodes[start]
-            nodes.addAll(current.children)
-            totalChildrenCount(nodes, acc + current.children.size, start + 1)
+            val current = nodes.next()
+            totalChildrenCount(nodes + current.children.iterator(), acc + current.children.size)
         }
     }
 }
 
-private tailrec fun totalScore3Aggregate(nodes: MutableList<Node>, acc: Long = 0, start: Int = 0): Long {
+private tailrec fun totalScore3Aggregate(nodes: Iterator<Node>, acc: Long = 0): Long {
     return when {
-        start >= nodes.size -> acc
+        !nodes.hasNext() -> acc
         else -> {
-            val current = nodes[start]
-            nodes.addAll(current.children)
-            totalScore3Aggregate(nodes, acc + current.children.sumByLong { it.score3.toLong() }, start + 1)
+            val current = nodes.next()
+            totalScore3Aggregate(
+                nodes + current.children.iterator(),
+                acc + current.children.sumByLong { it.score3.toLong() })
         }
     }
 }
